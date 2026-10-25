@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExpenseFlow | Budget Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app">
+    <aside class="sidebar">
+        <h2>◈ ExpenseFlow</h2>
+        <p class="menu-title">MENU</p>
+        <button class="nav active" data-page="dashboard">▦ Dashboard</button>
+        <button class="nav" data-page="transactions">↕ Transactions</button>
+        <button class="nav" data-page="budgets">◎ Budgets</button>
+        <button class="nav" data-page="reports">▥ Reports</button>
+        <div class="side-bottom">
+            <div class="avatar">EF</div>
+            <div><strong>My Finance</strong><small>Personal Account</small></div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <h1 id="pageTitle">Dashboard</h1>
+                <p>Manage your money with confidence.</p>
+            </div>
+            <button class="primary" id="addTop">+ Add Expense</button>
+        </header>
+
+        <section id="dashboardPage" class="page">
+            <div class="welcome">
+                <div><h2>Good day! 👋</h2><p>Here is your financial overview.</p></div>
+                <input type="month" id="monthFilter">
+            </div>
+
+            <div class="stats">
+                <article class="stat">
+                    <span>Total Expenses</span>
+                    <h2 id="total">₹0.00</h2>
+                    <small>Selected month</small>
+                </article>
+                <article class="stat">
+                    <span>Transactions</span>
+                    <h2 id="count">0</h2>
+                    <small>Recorded expenses</small>
+                </article>
+                <article class="stat">
+                    <span>Top Category</span>
+                    <h2 id="topCategory">—</h2>
+                    <small>Highest spending</small>
+                </article>
+                <article class="stat">
+                    <span>Budget Alerts</span>
+                    <h2 id="alertCount">0</h2>
+                    <small>Categories over budget</small>
+                </article>
+            </div>
+
+            <div class="charts">
+                <article class="panel">
+                    <h3>Spending by Category</h3>
+                    <div class="chart-wrap"><canvas id="categoryChart"></canvas></div>
+                </article>
+                <article class="panel">
+                    <h3>Expense Distribution</h3>
+                    <div class="chart-wrap"><canvas id="barChart"></canvas></div>
+                </article>
+            </div>
+
+            <div class="lower">
+                <article class="panel">
+                    <div class="panel-heading">
+                        <h3>Recent Transactions</h3>
+                        <button class="text-btn" data-go="transactions">View all</button>
+                    </div>
+                    <div id="recentList"></div>
+                </article>
+                <article class="panel">
+                    <h3>Budget Overview</h3>
+                    <div id="budgetOverview"></div>
+                </article>
+            </div>
+        </section>
+
+        <section id="transactionsPage" class="page hidden">
+            <article class="panel">
+                <div class="filters">
+                    <input id="search" placeholder="Search description or category...">
+                    <select id="categoryFilter">
+                        <option value="">All categories</option>
+                        <option>Food</option><option>Transport</option>
+                        <option>Shopping</option><option>Bills</option>
+                        <option>Entertainment</option><option>Health</option>
+                        <option>Education</option><option>Other</option>
+                    </select>
+                    <select id="sort">
+                        <option value="newest">Newest first</option>
+                        <option value="oldest">Oldest first</option>
+                        <option value="high">Highest amount</option>
+                        <option value="low">Lowest amount</option>
+                    </select>
+                </div>
+                <div id="transactionList"></div>
+            </article>
+        </section>
+
+        <section id="budgetsPage" class="page hidden">
+            <article class="panel">
+                <h3>Set Category Budgets</h3>
+                <form id="budgetForm" class="form-grid">
+                    <label>Category
+                        <select id="budgetCategory">
+                            <option>Food</option><option>Transport</option>
+                            <option>Shopping</option><option>Bills</option>
+                            <option>Entertainment</option><option>Health</option>
+                            <option>Education</option><option>Other</option>
+                        </select>
+                    </label>
+                    <label>Monthly limit (₹)
+                        <input id="budgetAmount" type="number" min="1" step="0.01" required>
+                    </label>
+                    <button class="primary" type="submit">Save Budget</button>
+                </form>
+                <div id="allBudgets"></div>
+            </article>
+        </section>
+
+        <section id="reportsPage" class="page hidden">
+            <article class="panel">
+                <h3>Monthly Report</h3>
+                <p id="reportMonth"></p>
+                <h2 id="reportTotal">₹0.00</h2>
+                <div id="reportCategories"></div>
+                <button class="primary" id="exportCsv">Export CSV</button>
+            </article>
+        </section>
+    </main>
+</div>
+
+<div class="modal hidden" id="expenseModal">
+    <form id="expenseForm" class="modal-card">
+        <div class="panel-heading">
+            <h2>Add Expense</h2>
+            <button type="button" class="close" id="closeModal">✕</button>
+        </div>
+        <label>Amount (₹)
+            <input id="amount" type="number" min="0.01" step="0.01" required placeholder="0.00">
+        </label>
+        <label>Category
+            <select id="category">
+                <option>Food</option><option>Transport</option>
+                <option>Shopping</option><option>Bills</option>
+                <option>Entertainment</option><option>Health</option>
+                <option>Education</option><option>Other</option>
+            </select>
+        </label>
+        <label>Description
+            <input id="description" maxlength="100" required placeholder="e.g. Lunch">
+        </label>
+        <label>Date
+            <input id="date" type="date" required>
+        </label>
+        <div class="modal-actions">
+            <button type="button" class="secondary" id="cancelModal">Cancel</button>
+            <button class="primary" type="submit">Save Expense</button>
+        </div>
+    </form>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="script.js"></script>
+</body>
+</html>
